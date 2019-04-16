@@ -3,6 +3,7 @@ package com.example.mvvm_example.view
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProviders
 import com.example.mvvm_example.R
 import com.example.mvvm_example.databinding.ActivityTipCalculatorBinding
 import com.example.mvvm_example.viewmodel.CalculatorViewModel
@@ -16,7 +17,8 @@ class TipCalculatorActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_tip_calculator)
-        binding.vm = CalculatorViewModel(application)
+//        binding.vm = CalculatorViewModel(application)
+        binding.vm = ViewModelProviders.of(this).get(CalculatorViewModel::class.java)
         setSupportActionBar(toolbar)
     }
 

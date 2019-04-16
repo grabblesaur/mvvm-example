@@ -2,14 +2,14 @@ package com.example.mvvm_example.viewmodel
 
 import android.app.Application
 import androidx.databinding.BaseObservable
+import androidx.databinding.Observable
 import com.example.mvvm_example.R
 import com.example.mvvm_example.model.Calculator
 import com.example.mvvm_example.model.TipCalculation
 
 private const val TAG = "CalculatorViewModel"
 
-class CalculatorViewModel(val app: Application,
-                          val calculator: Calculator = Calculator()) : BaseObservable() {
+class CalculatorViewModel @JvmOverloads constructor(app: Application, val calculator: Calculator = Calculator()) : ObservableViewModel(app) {
 
     var inputCheckAmount = ""
     var inputTipPercentage = ""
@@ -23,6 +23,7 @@ class CalculatorViewModel(val app: Application,
     }
 
     private fun updateOutputs(tc: TipCalculation) {
+        val app = getApplication<Application>()
         outputCheckAmount = app.getString(R.string.dollar_amount, tc.checkAmount)
         outputTipAmount = app.getString(R.string.dollar_amount, tc.tipAmount)
         outputGrandTotal = app.getString(R.string.dollar_amount, tc.grandTotal)
@@ -38,5 +39,4 @@ class CalculatorViewModel(val app: Application,
             notifyChange()
         }
     }
-
 }
