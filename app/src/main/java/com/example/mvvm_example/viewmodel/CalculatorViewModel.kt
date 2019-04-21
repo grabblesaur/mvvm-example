@@ -11,22 +11,23 @@ private const val TAG = "CalculatorViewModel"
 
 class CalculatorViewModel @JvmOverloads constructor(app: Application, val calculator: Calculator = Calculator()) : ObservableViewModel(app) {
 
+    private var lastTipCalculated = TipCalculation()
+
     var inputCheckAmount = ""
     var inputTipPercentage = ""
 
-    var outputCheckAmount = ""
-    var outputTipAmount = ""
-    var outputGrandTotal = ""
+    val outputCheckAmount get() = getApplication<Application>().getString(R.string.dollar_amount, lastTipCalculated.checkAmount)
+    val outputTipAmount get() = getApplication<Application>().getString(R.string.dollar_amount, lastTipCalculated.tipAmount)
+    val outputGrandTotal get() = getApplication<Application>().getString(R.string.dollar_amount, lastTipCalculated.grandTotal)
+    val locationName get() = lastTipCalculated.location
 
     init {
         updateOutputs(TipCalculation())
     }
 
     private fun updateOutputs(tc: TipCalculation) {
-        val app = getApplication<Application>()
-        outputCheckAmount = app.getString(R.string.dollar_amount, tc.checkAmount)
-        outputTipAmount = app.getString(R.string.dollar_amount, tc.tipAmount)
-        outputGrandTotal = app.getString(R.string.dollar_amount, tc.grandTotal)
+        lastTipCalculated = tc
+        notifyChange()
     }
 
     fun calculateTip() {
@@ -34,9 +35,13 @@ class CalculatorViewModel @JvmOverloads constructor(app: Application, val calcul
         val tipPercentage = inputTipPercentage.toIntOrNull()
 
         if (checkAmount != null && tipPercentage != null) {
-            updateOutputs(calculator
-                    .calculateTip(checkAmount, tipPercentage))
-            notifyChange()
+            updateOutputs(calculator.calculateTip(checkAmount, tipPercentage))
         }
+    }
+
+    fun saveCurrentTip(name: String) {
+        val tipToSave = lastTipCalculated.copy(location = name)
+        calculator.saveTipCalculation(tipToSave)
+        updateOutputs(tipToSave)
     }
 }

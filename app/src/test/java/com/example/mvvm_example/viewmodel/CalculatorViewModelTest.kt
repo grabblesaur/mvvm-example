@@ -11,6 +11,7 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
+import org.mockito.verification.VerificationMode
 
 class CalculatorViewModelTest {
 
@@ -40,7 +41,7 @@ class CalculatorViewModelTest {
         calculatorViewModel.inputCheckAmount = "10.00"
         calculatorViewModel.inputTipPercentage = "15"
 
-        val stub = TipCalculation(10.0, 15, 1.5, 11.5)
+        val stub = TipCalculation("",10.0, 15, 1.5, 11.5)
         `when`(mockCalculator.calculateTip(10.00, 15)).thenReturn(stub)
         stubResource(10.0, "$10.00")
         stubResource(1.5, "$1.50")
@@ -71,5 +72,26 @@ class CalculatorViewModelTest {
         calculatorViewModel.calculateTip()
 
         verify(mockCalculator, never()).calculateTip(ArgumentMatchers.anyDouble(), ArgumentMatchers.anyInt())
+    }
+
+    @Test
+    fun testSaveCurrentTip() {
+        val stub = TipCalculation(checkAmount = 10.00,
+            tipPct = 15,
+            tipAmount = 1.50,
+            grandTotal = 11.50)
+        val stubLocationName = "Travellers Coffee"
+
+        fun setupTipCalculation() {
+            calculatorViewModel.inputCheckAmount = "10.00"
+            calculatorViewModel.inputTipPercentage = "15"
+            `when`(mockCalculator.calculateTip(10.00, 15)).thenReturn(stub)
+        }
+
+        setupTipCalculation()
+        calculatorViewModel.calculateTip()
+        calculatorViewModel.saveCurrentTip(stubLocationName)
+        verify(mockCalculator).saveTipCalculation(stub.copy(location = stubLocationName))
+        assertEquals(stubLocationName, calculatorViewModel.locationName)
     }
 }
