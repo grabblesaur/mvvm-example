@@ -3,6 +3,8 @@ package com.example.mvvm_example.viewmodel
 import android.app.Application
 import androidx.databinding.BaseObservable
 import androidx.databinding.Observable
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
 import com.example.mvvm_example.R
 import com.example.mvvm_example.model.Calculator
 import com.example.mvvm_example.model.TipCalculation
@@ -43,5 +45,24 @@ class CalculatorViewModel @JvmOverloads constructor(app: Application, val calcul
         val tipToSave = lastTipCalculated.copy(location = name)
         calculator.saveTipCalculation(tipToSave)
         updateOutputs(tipToSave)
+    }
+
+    fun loadTipCalculation(name: String) {
+        val tc = calculator.loadTipCalculation(name)
+        if (tc != null) {
+            inputCheckAmount = tc.checkAmount.toString()
+            inputTipPercentage = tc.checkAmount.toString()
+            updateOutputs(tc)
+            notifyChange()
+        }
+    }
+
+    fun loadSavedTipCalculations(): LiveData<List<TipCalculationSummaryItem>> {
+        return Transformations.map(calculator.loadSavedTipCalculations()) {
+            it.map {
+                TipCalculationSummaryItem(it.location,
+                        getApplication<Application>().getString(R.string.dollar_amount, it.grandTotal))
+            }
+        }
     }
 }

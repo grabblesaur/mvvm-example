@@ -13,7 +13,9 @@ import com.google.android.material.snackbar.Snackbar
 
 import kotlinx.android.synthetic.main.activity_tip_calculator.*
 
-class TipCalculatorActivity : AppCompatActivity(), SaveDialogFragment.Callback {
+class TipCalculatorActivity : AppCompatActivity(),
+    SaveDialogFragment.Callback,
+    LoadDialogFragment.Callback {
 
     lateinit var binding: ActivityTipCalculatorBinding
 
@@ -29,6 +31,11 @@ class TipCalculatorActivity : AppCompatActivity(), SaveDialogFragment.Callback {
         binding.vm?.saveCurrentTip(name)
     }
 
+    override fun onTipSelected(name: String) {
+        binding.vm?.loadTipCalculation(name)
+        Snackbar.make(binding.root, "Loaded $name", Snackbar.LENGTH_SHORT).show()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_tip_calculator, menu)
         return true
@@ -41,6 +48,7 @@ class TipCalculatorActivity : AppCompatActivity(), SaveDialogFragment.Callback {
                 true
             }
             R.id.action_load -> {
+                showLoadDialog()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -50,5 +58,10 @@ class TipCalculatorActivity : AppCompatActivity(), SaveDialogFragment.Callback {
     private fun showSaveDialog() {
         val saveDialogFragment = SaveDialogFragment()
         saveDialogFragment.show(supportFragmentManager, SaveDialogFragment::class.java.simpleName)
+    }
+
+    private fun showLoadDialog() {
+        val dialog = LoadDialogFragment()
+        dialog.show(supportFragmentManager, LoadDialogFragment::class.java.simpleName)
     }
 }
